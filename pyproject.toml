@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pointcloud-tile"
+version = "0.1.0"
+description = "Тайловый сервис для облаков точек с поддержкой TMS/WMTS"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "Kakovalev" }]
+keywords = ["lidar", "point-cloud", "tms", "wmts", "tiling", "las", "laz"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "redis>=5.0.0",
+    "boto3>=1.34.0",
+    "laspy[laszip]>=2.5.0",
+    "numpy>=1.26.0",
+    "open3d>=0.18.0",
+    "shapely>=2.0.0",
+    "scipy>=1.12.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "click>=8.1.0",
+    "httpx>=0.27.0",
+    "python-multipart>=0.0.9",
+    "structlog>=24.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "locust>=2.24.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+    "types-redis",
+]
+# PDAL устанавливается отдельно (apt/conda); см. Dockerfile и README
+pdal = []
+
+[project.scripts]
+pointcloud-tile = "pointcloud_tile.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pointcloud_tile"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers"
+markers = [
+    "integration: marks tests requiring external services (Redis, MinIO)",
+    "slow: marks slow tests (large point clouds)",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["pointcloud_tile"]
+
+[tool.coverage.run]
+source = ["pointcloud_tile"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:", "raise NotImplementedError"]

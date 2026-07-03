@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Pointcloud-Tile data
+/data/
+*.laz
+*.las
+*.ply
